@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment2">
+
+    <fragment
+        android:id="@+id/homeFragment2"
+        android:name="com.example.newsapplications.Fragments.HomeFragment"
+        android:label="fragment_home2"
+        tools:layout="@layout/fragment_home2" >
+        <action
+            android:id="@+id/action_homeFragment2_to_articleFragment2"
+            app:destination="@id/articleFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/saveFragment2"
+        android:name="com.example.newsapplications.Fragments.SaveFragment"
+        android:label="fragment_save2"
+        tools:layout="@layout/fragment_save2" >
+        <action
+            android:id="@+id/action_saveFragment2_to_articleFragment2"
+            app:destination="@id/articleFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/articleFragment2"
+        android:name="com.example.newsapplications.Fragments.ArticleFragment"
+        android:label="fragment_article2"
+        tools:layout="@layout/fragment_article2" >
+        <action
+            android:id="@+id/action_articleFragment2_to_homeFragment2"
+            app:destination="@id/homeFragment2" />
+        <action
+            android:id="@+id/action_articleFragment2_to_saveFragment2"
+            app:destination="@id/saveFragment2" />
+        <argument
+            android:name="Article"
+            app:argType="com.example.newsapplications.Models.Article"/>
+    </fragment>
+</navigation>
