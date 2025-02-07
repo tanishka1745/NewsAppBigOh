@@ -10,6 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.newsapplications.Fragments.HomeFragment
 import com.example.newsapplications.Fragments.SaveFragment
+
 import com.example.newsapplications.R
 
 import com.example.newsapplications.databinding.ActivityMainBinding
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> loadFragment(HomeFragment())
-                R.id.nav_save -> loadFragment(SaveFragment())
+               R.id.nav_save -> loadFragment(SaveFragment())
             }
             true
         }

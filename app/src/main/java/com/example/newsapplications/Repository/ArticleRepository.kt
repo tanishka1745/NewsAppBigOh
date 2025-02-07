@@ -14,4 +14,6 @@ class ArticleRepository(private val articleDao: ArticleDao) {
     fun isArticleSaved(title: String): LiveData<Boolean> {
         return articleDao.isArticleSaved(title)
     }
+
+
 }

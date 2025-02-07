@@ -16,6 +16,9 @@ interface ArticleDao {
     @Query("SELECT * FROM articles")
     fun getAllArticles(): LiveData<List<Article>>
 
+
+
+
     @Query("SELECT EXISTS(SELECT * FROM articles WHERE title = :title)")
     fun isArticleSaved(title: String): LiveData<Boolean>
 }
