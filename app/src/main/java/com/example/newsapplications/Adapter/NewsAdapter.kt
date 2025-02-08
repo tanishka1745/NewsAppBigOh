@@ -13,14 +13,20 @@ import com.example.newsapplications.R
 
 
 class NewsAdapter(private val onItemClick: (Article) -> Unit) : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
+
     private var articleList: MutableList<Article> = mutableListOf()
 
-
-
-    fun updateNews(articleArticle: List<Article>) {
+    // Updates the article list and notifies the RecyclerView of new items.
+    fun updateNews(newArticles: List<Article>) {
         val oldSize = articleList.size
-        articleList.addAll(articleArticle)
-        notifyItemRangeInserted(oldSize, articleArticle.size)  // Notify only new items
+        articleList.addAll(newArticles)
+        notifyItemRangeInserted(oldSize, newArticles.size) // Notify only for the new items
+    }
+
+    // This method resets the articles in the adapter and notifies that the data has changed.
+    fun setArticles(articles: List<Article>) {
+        this.articleList = articles.toMutableList()
+        notifyDataSetChanged() // Notify the adapter to refresh the entire list
     }
 
     inner class ArticleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -40,21 +46,19 @@ class NewsAdapter(private val onItemClick: (Article) -> Unit) : RecyclerView.Ada
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
         val article = articleList[position]
 
-        Glide.with(holder.itemView).load(article.urlToImage).into(holder.articleImage)
+        // Load image using Glide
+        Glide.with(holder.itemView)
+            .load(article.urlToImage)
+            .into(holder.articleImage)
+
+        // Bind article data to views
         holder.articleTitle.text = article.title
         holder.articleDescription.text = article.description
         holder.articleDateTime.text = article.publishedAt
 
-
-
+        // Handle item click
         holder.itemView.setOnClickListener {
             onItemClick(article)
         }
     }
-
-    fun setArticles(articles: List<Article>) {
-        this.articleList = articles.toMutableList()
-        notifyDataSetChanged()
-    }
 }
-

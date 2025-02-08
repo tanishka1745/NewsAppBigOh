@@ -14,8 +14,6 @@ import kotlinx.coroutines.launch
 
 class NewsViewModel(private val repository: NewsRepository) : ViewModel() {
 
-//    private val _newsList = MutableLiveData<List<Article>>()
-//    val newsList: LiveData<List<Article>> = _newsList
 
 
     private val _newsList = MutableLiveData<MutableList<Article>>(mutableListOf())
@@ -28,12 +26,7 @@ class NewsViewModel(private val repository: NewsRepository) : ViewModel() {
     private val _selectedArticle = MutableLiveData<Article?>()
     val selectedArticle: LiveData<Article?> = _selectedArticle
 
-//    fun fetchNews() {
-//        viewModelScope.launch {
-//            val news = repository.getNews("us","0abcd10a111e4c62a132efd3a18e0c9c", currentPage=1)
-//            _newsList.postValue(news ?: emptyList())
-//        }
-//    }
+
 
     fun loadNews()
     {
@@ -41,7 +34,7 @@ class NewsViewModel(private val repository: NewsRepository) : ViewModel() {
         isLoading= true
 
         viewModelScope.launch {
-            val newsArticle= repository.getNews("us","0abcd10a111e4c62a132efd3a18e0c9c", currentPage=1)
+            val newsArticle= repository.getNews("us","455a09ecdbc245bb9bbd0ea3d1d07975", currentPage=1)
             newsArticle?.let {
                 val updatedList=  _newsList.value ?: mutableListOf()
                 updatedList.addAll(it)
