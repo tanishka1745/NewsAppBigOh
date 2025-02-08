@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -14,8 +13,15 @@ import com.example.newsapplications.R
 
 
 class NewsAdapter(private val onItemClick: (Article) -> Unit) : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
+    private var articleList: MutableList<Article> = mutableListOf()
 
-    private var articleList: List<Article> = listOf()
+
+
+    fun updateNews(articleArticle: List<Article>) {
+        val oldSize = articleList.size
+        articleList.addAll(articleArticle)
+        notifyItemRangeInserted(oldSize, articleArticle.size)  // Notify only new items
+    }
 
     inner class ArticleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val articleImage: ImageView = itemView.findViewById(R.id.articleImage)
@@ -47,7 +53,8 @@ class NewsAdapter(private val onItemClick: (Article) -> Unit) : RecyclerView.Ada
     }
 
     fun setArticles(articles: List<Article>) {
-        this.articleList = articles
+        this.articleList = articles.toMutableList()
         notifyDataSetChanged()
     }
 }
+

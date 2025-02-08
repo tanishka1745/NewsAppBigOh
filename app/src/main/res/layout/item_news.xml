@@ -15,11 +15,12 @@
         android:padding="8dp">
 
       <androidx.cardview.widget.CardView
-          android:layout_width="160dp"
+          android:layout_width="100dp"
+          app:cardCornerRadius="8dp"
           android:layout_height="90dp">
           <ImageView
               android:id="@+id/articleImage"
-              android:layout_width="160dp"
+              android:layout_width="100dp"
               android:layout_height="90dp"
               android:scaleType="centerCrop" />
 

@@ -63,6 +63,9 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     //Glide
+
+    //Pagination
+    implementation ("androidx.paging:paging-runtime:3.1.1")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)

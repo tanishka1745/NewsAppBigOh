@@ -7,13 +7,12 @@ import com.example.newsapplications.Models.Article
 import com.example.newsapplications.Retrofit.NewsAPI
 
 
-
 class NewsRepository(private val newsApi: NewsAPI) {
 
 
-    suspend fun getNews(): List<Article>? {
+    suspend fun getNews(s: String, s1: String, currentPage: Int): List<Article>? {
         return try {
-            val response = newsApi.getNews("us",  "0abcd10a111e4c62a132efd3a18e0c9c",1)
+            val response = newsApi.getNews("us","0abcd10a111e4c62a132efd3a18e0c9c",1)
             Log.d("NewsRepository", "API response: ${response.raw()}")
 
             if (response.isSuccessful) {
@@ -30,4 +29,6 @@ class NewsRepository(private val newsApi: NewsAPI) {
         }
     }
 }
+
+
 

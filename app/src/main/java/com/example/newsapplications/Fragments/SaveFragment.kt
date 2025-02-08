@@ -15,6 +15,7 @@ import com.example.newsapplications.R
 import com.example.newsapplications.Repository.ArticleRepository
 import com.example.newsapplications.Repository.ArticleViewModel
 import com.example.newsapplications.Repository.ArticleViewModelFactory
+import com.example.newsapplications.Repository.NewsViewModelFactory
 import com.example.newsapplications.RoomDB.ArticleDatabase
 
 
