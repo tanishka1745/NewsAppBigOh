@@ -17,7 +17,11 @@ interface ArticleDao {
     fun getAllArticles(): LiveData<List<Article>>
 
 
+    @Query("SELECT * FROM articles WHERE title = :title LIMIT 1")
+    fun getArticleByTitle(title: String): Article?
 
+    @Query("DELETE FROM articles WHERE title = :title")
+    suspend fun deleteByTitle(title: String)
 
     @Query("SELECT EXISTS(SELECT * FROM articles WHERE title = :title)")
     fun isArticleSaved(title: String): LiveData<Boolean>

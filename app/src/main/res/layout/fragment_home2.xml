@@ -50,24 +50,36 @@
             android:id="@+id/chipTechnology"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checkable="true"
+            android:focusable="true"
+            android:clickable="true"
             android:text="Technology" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipSports"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checkable="true"
+            android:focusable="true"
+            android:clickable="true"
             android:text="Sports" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipHealth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checkable="true"
+            android:focusable="true"
+            android:clickable="true"
             android:text="Health" />
         <com.google.android.material.chip.Chip
-            android:id="@+id/chipEducation"
+            android:id="@+id/chipBusiness"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="EdTech" />
+            android:checkable="true"
+            android:focusable="true"
+            android:clickable="true"
+            android:text="Business" />
 
     </com.google.android.material.chip.ChipGroup>
 

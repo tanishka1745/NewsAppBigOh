@@ -8,12 +8,15 @@ class ArticleRepository(private val articleDao: ArticleDao) {
 
     val allArticles: LiveData<List<Article>> = articleDao.getAllArticles()
 
+    fun getArticleByTitle(title: String): Article? {
+        return articleDao.getArticleByTitle(title)
+    }
+
     suspend fun saveArticle(article: Article) {
         articleDao.insertArticle(article)
     }
-    fun isArticleSaved(title: String): LiveData<Boolean> {
-        return articleDao.isArticleSaved(title)
+    suspend fun deleteByTitle(title: String) {
+        articleDao.deleteByTitle(title)
     }
-
 
 }

@@ -12,7 +12,7 @@ class NewsRepository(private val newsApi: NewsAPI) {
 
     suspend fun getNews(s: String, s1: String, currentPage: Int): List<Article>? {
         return try {
-            val response = newsApi.getNews("us","0abcd10a111e4c62a132efd3a18e0c9c",1)
+            val response = newsApi.getNews("us","455a09ecdbc245bb9bbd0ea3d1d07975",1)
             Log.d("NewsRepository", "API response: ${response.raw()}")
 
             if (response.isSuccessful) {
@@ -23,6 +23,15 @@ class NewsRepository(private val newsApi: NewsAPI) {
                 Log.e("NewsRepository", "API Error: ${response.errorBody()?.string()}")
                 null
             }
+        } catch (e: Exception) {
+            Log.e("NewsRepository", "Exception: ${e.localizedMessage}")
+            null
+        }
+    }
+    suspend fun getCategoryNews(country: String, category: String, apiKey: String, currentPage: Int): List<Article>? {
+        return try {
+            val response = newsApi.getCategoryNews(country, category, apiKey, currentPage)
+            if (response.isSuccessful) response.body()?.articles else null
         } catch (e: Exception) {
             Log.e("NewsRepository", "Exception: ${e.localizedMessage}")
             null

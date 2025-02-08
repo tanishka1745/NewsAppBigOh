@@ -6,18 +6,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newsapplications.Adapter.ArticleAdapter
+import com.example.newsapplications.Models.Article
 import com.example.newsapplications.R
 import com.example.newsapplications.Repository.ArticleRepository
 import com.example.newsapplications.Repository.ArticleViewModel
 import com.example.newsapplications.Repository.ArticleViewModelFactory
 import com.example.newsapplications.Repository.NewsViewModelFactory
 import com.example.newsapplications.RoomDB.ArticleDatabase
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class SaveFragment : Fragment() {
@@ -69,5 +74,8 @@ class SaveFragment : Fragment() {
                 Log.d("SaveFragment", "No articles found")
             }
         })
+
     }
 }
+
+

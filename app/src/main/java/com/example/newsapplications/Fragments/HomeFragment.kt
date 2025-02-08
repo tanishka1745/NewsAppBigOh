@@ -1,11 +1,13 @@
 package com.example.newsapplications.Fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,13 +22,15 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
 
+
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: NewsViewModel
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var progressbar: ProgressBar
     private lateinit var chipGroup: ChipGroup
-    private var selectedCategory: String = "technology" // Default category
+
+    private val selectedCategories = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,46 +42,46 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize ViewModel to be shared across fragments
-        progressbar= view.findViewById(R.id.progressBar)
+        // Initialize views
+        progressbar = view.findViewById(R.id.progressBar)
         chipGroup = view.findViewById(R.id.chipGroupFilters)
+
+        // Initialize ViewModel
         val api = RetrofitInstance.api
         val repository = NewsRepository(api)
-        viewModel = ViewModelProvider(requireActivity(), NewsViewModelFactory(repository))[NewsViewModel::class.java]
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            NewsViewModelFactory(repository)
+        )[NewsViewModel::class.java]
 
+        // Initialize adapter
         newsAdapter = NewsAdapter { article ->
-            // Pass selected article to ViewModel
             viewModel.selectArticle(article)
-
-            // Navigate to ArticleFragment
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, ArticleFragment())
                 .addToBackStack(null)
                 .commit()
         }
-        chipGroup.setOnCheckedChangeListener { _, checkedId ->
-            val chip: Chip? = view.findViewById(checkedId)
-            chip?.let {
-                selectedCategory = it.text.toString().lowercase()
-                //fetchNewsByCategory(selectedCategory)
-            }
-        }
-        //fetchNewsByCategory(selectedCategory)
-
 
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerNews)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = newsAdapter
-        // Observe the news list and update the adapter
+
         viewModel.newsList.observe(viewLifecycleOwner) { articles ->
-            if (articles != null) {
-                newsAdapter.setArticles(articles)
-                newsAdapter.updateNews(articles)
-                progressbar.visibility= View.GONE
+            articles?.let {
+                if (selectedCategories.isEmpty()) {
+                    newsAdapter.setArticles(it) // Replace all news if no category is selected
+                } else {
+                    newsAdapter.updateNews(it) // Append new articles for selected categories
+                }
+                progressbar.visibility = View.GONE // Hide progress bar
             }
         }
-        progressbar.visibility= View.VISIBLE
+        progressbar.visibility = View.VISIBLE
         viewModel.loadNews()
+
+        setupChipClickListener()
+
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -87,17 +91,44 @@ class HomeFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                // Load more when reaching the last item
                 if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
                     progressbar.visibility = View.VISIBLE
-                    viewModel.loadNews()
+                    viewModel.loadNews(selectedCategories) // Fetch news for selected categories
                 }
             }
         })
     }
-//    private fun fetchNewsByCategory(category: String) {
-//        progressbar.visibility = View.VISIBLE
-//        viewModel.loadNews(category)
-//    }
+
+
+private fun setupChipClickListener() {
+    for (i in 0 until chipGroup.childCount) {
+        val chip = chipGroup.getChildAt(i) as Chip
+        chip.setOnCheckedChangeListener { _, isChecked ->
+            val category = chip.text.toString().lowercase()
+
+            if (isChecked) {
+                if (!selectedCategories.contains(category)) {
+                    chip.setChipBackgroundColorResource(R.color.red);
+                    selectedCategories.add(category) // Add category if checked
+                }
+            } else {
+                chip.setChipBackgroundColorResource(R.color.white);
+                selectedCategories.remove(category) // Remove category if unchecked
+            }
+
+            Log.d("ChipSelection", "Selected Categories: $selectedCategories")
+
+            // Load news based on selected categories, or all news if none selected
+            if (selectedCategories.isEmpty())
+            {
+                Log.d("NewsFetching", "Fetching all news")
+                viewModel.loadNews()
+            } else {
+                Log.d("NewsFetching", "Fetching news for categories: $selectedCategories")
+                viewModel.loadNews(selectedCategories)
+            }
+        }
+    }
 }
 
+}

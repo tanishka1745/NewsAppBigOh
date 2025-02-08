@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.newsapplications.Models.Article
 import com.example.newsapplications.R
@@ -26,6 +27,7 @@ class ArticleFragment : Fragment() {
     private lateinit var viewModel2: NewsViewModel
     private var displayedArticle: Article? = null
     private var isFromSaveFragment: Boolean = false
+    private var isArticleSave: Boolean= false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +47,7 @@ class ArticleFragment : Fragment() {
         val articleDescription: TextView = view.findViewById(R.id.articleDescription)
         val articleDateTime: TextView = view.findViewById(R.id.articleDateTime)
         val fab: FloatingActionButton = view.findViewById(R.id.fab)
+        val delete: FloatingActionButton= view.findViewById(R.id.fabdelete)
 
 
         viewModel2 = ViewModelProvider(requireActivity())[NewsViewModel::class.java]
@@ -59,6 +62,7 @@ class ArticleFragment : Fragment() {
                     articleDateTime.text = it.publishedAt
 
                     displayedArticle = it
+                    delete.visibility= View.GONE
 
 
                 }
@@ -84,22 +88,20 @@ class ArticleFragment : Fragment() {
                 content = content
             )
             fab.visibility= View.GONE
-        }
+            delete.visibility=View.VISIBLE
+            delete.setOnClickListener {
+                displayedArticle!!.title?.let { it1 -> viewModel.deleteByTitle(it1) }
+                Toast.makeText(requireContext(), "Article deleted", Toast.LENGTH_SHORT).show()
+                delete.visibility = View.GONE
 
+            }
+        }
 
         val articleDao = ArticleDatabase.getDatabase(requireContext()).articleDao()
         val repository = ArticleRepository(articleDao)
         val viewModelFactory = ArticleViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ArticleViewModel::class.java)
 
-
-//        viewModel.isArticleSaved(displayedArticle?.title ?: "").observe(viewLifecycleOwner) { saved ->
-//            if (saved) {
-//                fab.visibility = View.GONE
-//            } else {
-//                fab.visibility = View.VISIBLE
-//            }
-//        }
 
 
         fab.setOnClickListener {
