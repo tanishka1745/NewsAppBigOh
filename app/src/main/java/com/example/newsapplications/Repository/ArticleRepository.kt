@@ -18,5 +18,8 @@ class ArticleRepository(private val articleDao: ArticleDao) {
     suspend fun deleteByTitle(title: String) {
         articleDao.deleteByTitle(title)
     }
+    fun isArticleSavedByTitle(title: String): Boolean {
 
+        return articleDao.getArticleByTitle(title) != null
+    }
 }

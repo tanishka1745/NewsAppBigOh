@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.newsapplications.Models.Article
 import com.example.newsapplications.R
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 
 class NewsAdapter(private val onItemClick: (Article) -> Unit) : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
@@ -26,6 +29,21 @@ class NewsAdapter(private val onItemClick: (Article) -> Unit) : RecyclerView.Ada
     fun setArticles(articles: List<Article>) {
         this.articleList = articles.toMutableList()
         notifyDataSetChanged()
+    }
+    fun formatDateTime(dateTime: String?): String {
+        if (dateTime.isNullOrEmpty()) return "Unknown Date"
+
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC") //
+
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy | hh:mm a", Locale.getDefault())
+            val date = inputFormat.parse(dateTime)
+
+            date?.let { outputFormat.format(it) } ?: "Unknown Date"
+        } catch (e: Exception) {
+            "Unknown Date"
+        }
     }
 
     inner class ArticleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -50,10 +68,10 @@ class NewsAdapter(private val onItemClick: (Article) -> Unit) : RecyclerView.Ada
             .load(article.urlToImage)
             .into(holder.articleImage)
 
-        // Bind article data to views
+
         holder.articleTitle.text = article.title
         holder.articleDescription.text = article.description
-        holder.articleDateTime.text = article.publishedAt
+        holder.articleDateTime.text = formatDateTime(article.publishedAt)
 
         // Handle item click
         holder.itemView.setOnClickListener {

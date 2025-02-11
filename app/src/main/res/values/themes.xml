@@ -9,8 +9,13 @@
     <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
 
         <item name="android:color">
-            @color/black
+            @color/light_red
         </item>
+    </style>
+
+    <style name="Theme.NewsApplications." parent="Theme.Material3.DayNight">
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnSecondary">@color/red</item>
     </style>
 
 </resources>

@@ -5,20 +5,23 @@ import android.util.Log
 
 import com.example.newsapplications.Models.Article
 import com.example.newsapplications.Retrofit.NewsAPI
+import com.example.newsapplications.Utils.Constant
 
 
 class NewsRepository(private val newsApi: NewsAPI) {
 
-
-    suspend fun getNews(s: String, s1: String, currentPage: Int): List<Article>? {
+    // Fetch general news with pagination and total count of articles
+    suspend fun getNews(country: String, apiKey: String, currentPage: Int): PaginatedResponse? {
         return try {
-            val response = newsApi.getNews("us","455a09ecdbc245bb9bbd0ea3d1d07975",1)
+            // Pass currentPage to get the correct page of news
+            val response = newsApi.getNews(country, apiKey, currentPage)
             Log.d("NewsRepository", "API response: ${response.raw()}")
 
             if (response.isSuccessful) {
                 val articles = response.body()?.articles
-                Log.d("NewsRepository", "Articles received: ${articles?.size ?: 0}")
-                articles
+                val totalResults = response.body()?.totalResults ?: 0 // Get total results from API
+                Log.d("NewsRepository", "Articles received: ${articles?.size ?: 0}, Total results: $totalResults")
+                PaginatedResponse(articles, totalResults)
             } else {
                 Log.e("NewsRepository", "API Error: ${response.errorBody()?.string()}")
                 null
@@ -28,16 +31,15 @@ class NewsRepository(private val newsApi: NewsAPI) {
             null
         }
     }
-    suspend fun getCategoryNews(country: String, category: String, apiKey: String, currentPage: Int): List<Article>? {
-        return try {
-            val response = newsApi.getCategoryNews(country, category, apiKey, currentPage)
-            if (response.isSuccessful) response.body()?.articles else null
-        } catch (e: Exception) {
-            Log.e("NewsRepository", "Exception: ${e.localizedMessage}")
-            null
-        }
-    }
+
+
 }
+
+// A data class to hold articles and total count of available articles
+data class PaginatedResponse(
+    val articles: List<Article>?,
+    val totalResults: Int // Total available articles for pagination
+)
 
 
 

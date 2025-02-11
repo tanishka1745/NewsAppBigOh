@@ -1,6 +1,7 @@
 package com.example.newsapplications.Fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -27,7 +28,7 @@ class ArticleFragment : Fragment() {
     private lateinit var viewModel2: NewsViewModel
     private var displayedArticle: Article? = null
     private var isFromSaveFragment: Boolean = false
-    private var isArticleSave: Boolean= false
+    private var isArticleSave: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,8 +48,7 @@ class ArticleFragment : Fragment() {
         val articleDescription: TextView = view.findViewById(R.id.articleDescription)
         val articleDateTime: TextView = view.findViewById(R.id.articleDateTime)
         val fab: FloatingActionButton = view.findViewById(R.id.fab)
-        val delete: FloatingActionButton= view.findViewById(R.id.fabdelete)
-
+        val delete: FloatingActionButton = view.findViewById(R.id.fabdelete)
 
         viewModel2 = ViewModelProvider(requireActivity())[NewsViewModel::class.java]
 
@@ -62,9 +62,7 @@ class ArticleFragment : Fragment() {
                     articleDateTime.text = it.publishedAt
 
                     displayedArticle = it
-                    delete.visibility= View.GONE
-
-
+                    delete.visibility = View.GONE
                 }
             }
         } else {
@@ -87,13 +85,12 @@ class ArticleFragment : Fragment() {
                 publishedAt = publishedAt,
                 content = content
             )
-            fab.visibility= View.GONE
-            delete.visibility=View.VISIBLE
+            fab.visibility = View.GONE
+            delete.visibility = View.VISIBLE
             delete.setOnClickListener {
                 displayedArticle!!.title?.let { it1 -> viewModel.deleteByTitle(it1) }
                 Toast.makeText(requireContext(), "Article deleted", Toast.LENGTH_SHORT).show()
                 delete.visibility = View.GONE
-
             }
         }
 
@@ -103,12 +100,22 @@ class ArticleFragment : Fragment() {
         viewModel = ViewModelProvider(this, viewModelFactory).get(ArticleViewModel::class.java)
 
 
-
         fab.setOnClickListener {
             displayedArticle?.let { article ->
-                viewModel.saveArticle(article)
-                Toast.makeText(requireContext(), "Article Saved!", Toast.LENGTH_SHORT).show()
-                fab.visibility = View.GONE  // Hide FAB after saving
+
+                article.title?.let { title ->
+                    viewModel.isArticleSavedByTitle(title).observe(viewLifecycleOwner) { isSaved ->
+                        if (isSaved) {
+
+                            Toast.makeText(requireContext(), "This news is already saved", Toast.LENGTH_SHORT).show()
+                        } else {
+
+                            viewModel.saveArticle(article)
+                            Toast.makeText(requireContext(), "Article Saved!", Toast.LENGTH_SHORT).show()
+                            fab.visibility = View.GONE  // Hide FAB after saving
+                        }
+                    }
+                }
             } ?: Toast.makeText(requireContext(), "No article to save", Toast.LENGTH_SHORT).show()
         }
     }

@@ -70,7 +70,6 @@ class SaveFragment : Fragment() {
                 }
                 recyclerView.adapter = adapter
             } else {
-                // Handle the case where no articles are available
                 Log.d("SaveFragment", "No articles found")
             }
         })

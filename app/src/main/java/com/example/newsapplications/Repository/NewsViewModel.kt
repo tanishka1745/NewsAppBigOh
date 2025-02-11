@@ -8,48 +8,59 @@ import androidx.lifecycle.viewModelScope
 
 
 import com.example.newsapplications.Models.Article
+import com.example.newsapplications.Utils.Constant
 
 import kotlinx.coroutines.launch
 
 
-
 class NewsViewModel(private val repository: NewsRepository) : ViewModel() {
 
-    private val _newsList = MutableLiveData<List<Article>>()
-    val newsList: LiveData<List<Article>> = _newsList
-
-    private var currentPage = 1
+    var currentPage = 1
     private var isLoading = false
+    private var totalArticles: Int = 0
+    private var fetchedArticles: Int = 0
 
     private val _selectedArticle = MutableLiveData<Article?>()
     val selectedArticle: LiveData<Article?> = _selectedArticle
 
-    fun loadNews(selectedCategories: List<String> = emptyList()) {
+    private val _newsList = MutableLiveData<List<Article>>()
+    val newsList: LiveData<List<Article>> get() = _newsList
+
+    // Function to check if more data is available
+    fun hasMoreData(): Boolean {
+        return fetchedArticles < totalArticles
+    }
+
+    // Function to load news
+    fun loadNews(page: Int = 1) {
         if (isLoading) return
         isLoading = true
 
-        Log.d("NewsViewModel", "Fetching news... Categories: $selectedCategories | Page: $currentPage")
+        Log.d("NewsViewModel", "Fetching general news | Page: $page")
 
         viewModelScope.launch {
             try {
-                val newsArticles = if (selectedCategories.isEmpty()) {
-                    Log.d("NewsViewModel", "Fetching general news")
-                    repository.getNews("us", "455a09ecdbc245bb9bbd0ea3d1d07975", currentPage)
-                } else {
-                    Log.d("NewsViewModel", "Fetching category news for: ${selectedCategories.joinToString(", ")}")
-                    repository.getCategoryNews("us", selectedCategories.joinToString(","), "455a09ecdbc245bb9bbd0ea3d1d07975", currentPage)
-                }
+                // Fetch general news
+                val newsResponse = repository.getNews(Constant.Country, Constant.API_KEY, page)
 
-                newsArticles?.let {
+                newsResponse?.let {
+                    // Update the news list with the new articles
                     val updatedList = _newsList.value?.toMutableList() ?: mutableListOf()
-                    updatedList.addAll(it)
+                    updatedList.addAll(it.articles ?: emptyList())
                     _newsList.postValue(updatedList)
 
-                    Log.d("NewsViewModel", "Received ${it.size} articles for categories: $selectedCategories")
+                    // Update the number of fetched articles
+                    fetchedArticles += it.articles?.size ?: 0
 
-                    currentPage++
-                    Log.d("NewsViewModel", "Incrementing page number: $currentPage")
-                } ?: Log.d("NewsViewModel", "No articles received for categories: $selectedCategories")
+                    // Update the total number of articles available
+                    totalArticles = it.totalResults
+
+                    // Increment page number if there is more data
+                    if (hasMoreData()) {
+                        currentPage++
+                        Log.d("NewsViewModel", "Incrementing page number: $currentPage")
+                    }
+                } ?: Log.d("NewsViewModel", "No articles received")
 
             } catch (e: Exception) {
                 Log.e("NewsViewModel", "Error fetching news: ${e.localizedMessage}")
@@ -59,10 +70,8 @@ class NewsViewModel(private val repository: NewsRepository) : ViewModel() {
         }
     }
 
+    // Function to select a specific article
     fun selectArticle(article: Article) {
         _selectedArticle.postValue(article)
     }
 }
-
-
-

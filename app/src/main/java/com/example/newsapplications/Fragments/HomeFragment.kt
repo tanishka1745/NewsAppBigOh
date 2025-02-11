@@ -6,12 +6,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.HorizontalScrollView
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newsapplications.Adapter.NewsAdapter
+import com.example.newsapplications.Models.Article
 import com.example.newsapplications.R
 import com.example.newsapplications.Repository.NewsRepository
 
@@ -22,14 +26,12 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
 
-
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: NewsViewModel
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var progressbar: ProgressBar
     private lateinit var chipGroup: ChipGroup
-
     private val selectedCategories = mutableListOf<String>()
 
     override fun onCreateView(
@@ -42,11 +44,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize views
         progressbar = view.findViewById(R.id.progressBar)
-        chipGroup = view.findViewById(R.id.chipGroupFilters)
 
-        // Initialize ViewModel
+        // Initialize Retrofit API and ViewModel
         val api = RetrofitInstance.api
         val repository = NewsRepository(api)
         viewModel = ViewModelProvider(
@@ -54,7 +54,7 @@ class HomeFragment : Fragment() {
             NewsViewModelFactory(repository)
         )[NewsViewModel::class.java]
 
-        // Initialize adapter
+
         newsAdapter = NewsAdapter { article ->
             viewModel.selectArticle(article)
             parentFragmentManager.beginTransaction()
@@ -67,12 +67,13 @@ class HomeFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = newsAdapter
 
+        // Observe news list changes
         viewModel.newsList.observe(viewLifecycleOwner) { articles ->
             articles?.let {
                 if (selectedCategories.isEmpty()) {
                     newsAdapter.setArticles(it) // Replace all news if no category is selected
                 } else {
-                    newsAdapter.updateNews(it) // Append new articles for selected categories
+                    applySorting(it) // Apply sorting based on selected filters
                 }
                 progressbar.visibility = View.GONE // Hide progress bar
             }
@@ -80,8 +81,28 @@ class HomeFragment : Fragment() {
         progressbar.visibility = View.VISIBLE
         viewModel.loadNews()
 
-        setupChipClickListener()
+        // Setup Chip click listeners for sorting
+        chipGroup = view.findViewById(R.id.chipGroupFilters)
 
+        // Handling individual chip clicks
+        val chipTitle = view.findViewById<Chip>(R.id.chipTitle)
+        val chipDate = view.findViewById<Chip>(R.id.chipDate)
+        val chipDescription = view.findViewById<Chip>(R.id.chipDescription)
+
+        chipTitle.setOnClickListener {
+            toggleChipSelection(chipTitle, "Title")
+            applySorting(viewModel.newsList.value ?: emptyList())
+        }
+
+        chipDate.setOnClickListener {
+            toggleChipSelection(chipDate, "Date")
+            applySorting(viewModel.newsList.value ?: emptyList())
+        }
+
+        chipDescription.setOnClickListener {
+            toggleChipSelection(chipDescription, "Description")
+            applySorting(viewModel.newsList.value ?: emptyList())
+        }
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -92,43 +113,60 @@ class HomeFragment : Fragment() {
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
                 if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
-                    progressbar.visibility = View.VISIBLE
-                    viewModel.loadNews(selectedCategories) // Fetch news for selected categories
+                    // Check if more data is available
+                    if (viewModel.hasMoreData()) {
+                        progressbar.visibility = View.VISIBLE
+                        // Load next page of news
+                        viewModel.loadNews(viewModel.currentPage + 1)
+                    } else {
+                        // No more data, hide progress bar
+                        progressbar.visibility = View.GONE
+                    }
                 }
             }
         })
     }
 
-
-private fun setupChipClickListener() {
-    for (i in 0 until chipGroup.childCount) {
-        val chip = chipGroup.getChildAt(i) as Chip
-        chip.setOnCheckedChangeListener { _, isChecked ->
-            val category = chip.text.toString().lowercase()
-
-            if (isChecked) {
-                if (!selectedCategories.contains(category)) {
-                    chip.setChipBackgroundColorResource(R.color.red);
-                    selectedCategories.add(category) // Add category if checked
-                }
-            } else {
-                chip.setChipBackgroundColorResource(R.color.white);
-                selectedCategories.remove(category) // Remove category if unchecked
-            }
-
-            Log.d("ChipSelection", "Selected Categories: $selectedCategories")
-
-            // Load news based on selected categories, or all news if none selected
-            if (selectedCategories.isEmpty())
-            {
-                Log.d("NewsFetching", "Fetching all news")
-                viewModel.loadNews()
-            } else {
-                Log.d("NewsFetching", "Fetching news for categories: $selectedCategories")
-                viewModel.loadNews(selectedCategories)
-            }
+    private fun toggleChipSelection(chip: Chip, category: String) {
+        if (selectedCategories.contains(category)) {
+            selectedCategories.remove(category)
+            chip.setChipBackgroundColorResource(android.R.color.white)
+        } else {
+            selectedCategories.add(category)
+            chip.setChipBackgroundColorResource(R.color.red)
         }
     }
-}
 
+    private fun applySorting(articles: List<Article>) {
+        val uniqueArticles = articles.distinctBy {
+            Triple(it.title?.lowercase()?.trim(), it.description?.lowercase()?.trim(), it.publishedAt?.trim())
+        }
+
+        val sortedList = when (selectedCategories.size) {
+            1 -> {
+                when (selectedCategories[0]) {
+                    "Title" -> uniqueArticles.sortedBy { it.title?.lowercase() ?: "" }
+                    "Date" -> uniqueArticles.sortedBy { it.publishedAt ?: "" }
+                    "Description" -> uniqueArticles.sortedBy { it.description?.lowercase() ?: "" }
+                    else -> uniqueArticles
+                }
+            }
+            2 -> {
+                when {
+                    selectedCategories.contains("Title") && selectedCategories.contains("Date") ->
+                        uniqueArticles.sortedWith(compareBy({ it.title?.lowercase() ?: "" }, { it.publishedAt ?: "" }))
+                    selectedCategories.contains("Title") && selectedCategories.contains("Description") ->
+                        uniqueArticles.sortedWith(compareBy({ it.title?.lowercase() ?: "" }, { it.description?.lowercase() ?: "" }))
+                    selectedCategories.contains("Date") && selectedCategories.contains("Description") ->
+                        uniqueArticles.sortedWith(compareBy({ it.publishedAt ?: "" }, { it.description?.lowercase() ?: "" }))
+                    else -> uniqueArticles
+                }
+            }
+            else -> uniqueArticles
+        }
+
+
+        newsAdapter.setArticles(sortedList)
+        Toast.makeText(requireContext(), "Sorted by: ${selectedCategories.joinToString(", ")}", Toast.LENGTH_SHORT).show()
+    }
 }

@@ -1,74 +1,76 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:fillViewport="true">
+
+  <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:padding="16dp">
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabdelete"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/outline_delete_24"
+        android:visibility="gone"
+        android:padding="10dp"
+        android:backgroundTint="@color/red"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp" />
+
+
+    <TextView
+        android:id="@+id/articleTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingTop="8dp"
+        android:layout_below="@id/fabdelete"
+        android:layout_marginTop="8dp" />
+
 
     <ImageView
         android:id="@+id/articleImage"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:scaleType="centerCrop"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"/>
-
-    <TextView
-        android:id="@+id/articleTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:layout_below="@id/articleImage"
-        android:layout_alignParentStart="true"
-        android:paddingTop="8dp"/>
-
-    <TextView
-        android:id="@+id/articleDateTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#666"
+        android:src="@drawable/placeholder"
         android:layout_below="@id/articleTitle"
-        android:layout_alignParentStart="true"
-        android:paddingBottom="8dp"/>
+        android:layout_marginTop="8dp" />
+
 
     <TextView
         android:id="@+id/articleDescription"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:layout_below="@id/articleDateTime"
-        android:layout_alignParentStart="true"/>
+        android:paddingTop="4dp"
+        android:layout_below="@id/articleImage" />
+
 
     <TextView
-        android:id="@+id/articleContent"
-        android:layout_width="wrap_content"
+        android:id="@+id/articleDateTime"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:layout_below="@id/articleDescription"
-        android:layout_alignParentStart="true"/>
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:paddingTop="4dp"
+        android:layout_below="@id/articleDescription" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabdelete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/red"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
-    android:src="@drawable/outline_delete_24" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+       <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/outline_save_24"
         android:backgroundTint="@color/red"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@android:drawable/ic_menu_save" />
+        android:layout_below="@id/articleDateTime"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentEnd="true" />
 
-</RelativeLayout>
+  </RelativeLayout>
+</ScrollView>

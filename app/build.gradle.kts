@@ -55,7 +55,8 @@ dependencies {
     implementation(libs.androidx.media3.database)
     kapt ("androidx.room:room-compiler:2.6.0")
     // Kotlin Extensions and Coroutines support for Room
-    implementation ("androidx.room:room-ktx:2.6.0")
+    implementation ("androidx.room:room-ktx:2.6.1")
+    implementation ("com.google.android.material:material:1.10.0")
     //Coroutine
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -63,6 +64,10 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     //Glide
+
+
+    //ViewPager
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
 
     //Pagination
     implementation ("androidx.paging:paging-runtime:3.1.1")
